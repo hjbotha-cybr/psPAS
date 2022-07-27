@@ -22,6 +22,13 @@ New-PASSession -Credential <PSCredential> [-newPassword <SecureString>] [-type <
  [-Confirm] [<CommonParameters>]
 ```
 
+### ISPSS
+```
+New-PASSession [-UseISPSSAuthentication] -LogonBaseURI <string> -BaseURI <String> [-PVWAAppName <String>]
+ [-SkipVersionCheck] [-Certificate <X509Certificate>] [-CertificateThumbprint <String>] [-SkipCertificateCheck] 
+ [-WhatIf] [-Confirm] [<CommonParameters>]
+```
+
 ### Gen1Radius
 ```
 New-PASSession -Credential <PSCredential> [-UseGen1API] -useRadiusAuthentication <Boolean> [-OTP <String>]

@@ -24,6 +24,12 @@ function New-PASSession {
 			ValueFromPipeline = $true,
 			ParameterSetName = 'Gen1Radius'
 		)]
+		[Parameter(
+			Mandatory = $True,
+			ValueFromPipeline = $false,
+			ValueFromPipelinebyPropertyName = $true,
+			ParameterSetName = 'Gen2ISPSS'
+		)]
 		[ValidateNotNullOrEmpty()]
 		[PSCredential]$Credential,
 
@@ -81,6 +87,22 @@ function New-PASSession {
 		)]
 		[Alias('SAMLToken')]
 		[String]$SAMLResponse,
+
+		[Parameter(
+			Mandatory = $True,
+			ValueFromPipeline = $false,
+			ValueFromPipelinebyPropertyName = $true,
+			ParameterSetName = 'Gen2ISPSS'
+		)]
+		[switch]$UseISPSSAuthentication,
+
+		[Parameter(
+			Mandatory = $True,
+			ValueFromPipeline = $false,
+			ValueFromPipelinebyPropertyName = $true,
+			ParameterSetName = 'Gen2ISPSS'
+		)]
+		[string]$LogonBaseUri,
 
 		[Parameter(
 			Mandatory = $True,
@@ -301,6 +323,21 @@ function New-PASSession {
 
 		Switch ($PSCmdlet.ParameterSetName) {
 
+			'Gen2ISPSS' {
+				
+				$LogonRequest['Uri'] = "$LogonBaseUri/api/idadmin/oauth2/platformtoken"
+
+				[PSCustomObject]$LogonRequest['Body'] = @{
+					grant_type    = "client_credentials"
+					client_id     = $($Credential.UserName)
+					client_secret = $($Credential.GetNetworkCredential().Password)
+				}
+				$LogonRequest['ContentType'] = 'application/x-www-form-urlencoded'
+
+				break
+
+			}
+
 			'integrated' {
 
 				$LogonRequest['Uri'] = "$Uri/api/Auth/Windows/Logon"  #hardcode Windows for integrated auth
@@ -393,7 +430,8 @@ function New-PASSession {
 							#Use specified delimiter to append OTP
 							$Delimiter = $OTPDelimiter
 
-						} Else {
+						}
+						Else {
 
 							#delimit with comma by default
 							$Delimiter = ','
@@ -467,14 +505,16 @@ function New-PASSession {
 
 				}
 
-			} catch {
+			}
+			catch {
 
 				if ($PSItem.FullyQualifiedErrorId -notmatch 'ITATS542I') {
 
 					#Throw all errors not related to ITATS542I
 					throw $PSItem
 
-				} Else {
+				}
+				Else {
 
 					#ITATS542I is expected for RADIUS Challenge
 
@@ -500,19 +540,29 @@ function New-PASSession {
 
 				}
 
-			} finally {
+			}
+			finally {
 
-				#If Logon Result
+				#If Logon Result			
+				
 				If ($PASSession) {
-
+					
 					If ($null -ne $PASSession.UserName) {
-
+						
 						throw "No Session Token for user $($PASSession.UserName)"
+						
+					}
+					
+					#ISPSS
+					If ($null -ne $PASSession.access_token) {
 
+						#ISSP Auth Token
+						$CyberArkLogonResult = "Bearer " + $PASSession.access_token
+						
 					}
 
 					#Version 10
-					If ($PASSession.length -ge 180) {
+					ElseIf ($PASSession.length -ge 180) {
 
 						#V10 Auth Token.
 						$CyberArkLogonResult = $PASSession
@@ -547,12 +597,14 @@ function New-PASSession {
 					if ( -not ($SkipVersionCheck)) {
 
 						Try {
-
 							#Get CyberArk ExternalVersion number.
+							Write-Verbose "YEP"
+							Write-Verbose ($Script:WebSession.Headers['Authorization'])
 							[System.Version]$Version = Get-PASServer -ErrorAction Stop |
-								Select-Object -ExpandProperty ExternalVersion
+							Select-Object -ExpandProperty ExternalVersion
 
-						} Catch { [System.Version]$Version = '0.0' }
+						}
+						Catch { [System.Version]$Version = '0.0' }
 
 					}
 

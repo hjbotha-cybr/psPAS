@@ -115,7 +115,7 @@
 	Begin {
 
 		#Set defaults for all function calls
-		$ProgressPreference = 'SilentlyContinue'
+		#$ProgressPreference = 'SilentlyContinue'
 		$PSBoundParameters.Add('UseBasicParsing', $true)
 
 		if ( -not ($PSBoundParameters.ContainsKey('ContentType'))) {
@@ -150,7 +150,8 @@
 
 					}
 
-				} else {
+				}
+				else {
 
 					#PWSH
 					if ($SkipCertificateCheck) {
@@ -215,7 +216,8 @@
 			#make web request, splat PSBoundParameters
 			$APIResponse = Invoke-WebRequest @PSBoundParameters -ErrorAction Stop
 
-		} catch [System.UriFormatException] {
+		}
+		catch [System.UriFormatException] {
 
 			#Catch URI Format errors. Likely $Script:BaseURI is not set; New-PASSession should be run.
 			$PSCmdlet.ThrowTerminatingError(
@@ -231,7 +233,9 @@
 
 			)
 
-		} catch {
+		}
+		catch {
+			#Write-Verbose $_.Errordetails.Message
 
 			$ErrorID = $null
 			$StatusCode = $($PSItem.Exception.Response).StatusCode.value__
@@ -248,14 +252,16 @@
 
 				throw $PSItem
 
-			} Else {
+			}
+			Else {
 
 				If (-not($StatusCode)) {
 
 					#Generic failure message if no status code/response
 					$ErrorMessage = "Error contacting $($PSItem.TargetObject.RequestUri.AbsoluteUri)"
 
-				} ElseIf ($ErrorDetails) {
+				}
+				ElseIf ($ErrorDetails) {
 
 					try {
 
@@ -279,7 +285,8 @@
 
 						}
 
-					} catch {
+					}
+					catch {
 
 						#If error converting JSON, return $ErrorDetails
 						#replace any new lines or whitespace with single spaces
@@ -306,7 +313,8 @@
 
 			)
 
-		} finally {
+		}
+		finally {
 
 			#If Session Variable passed as argument
 			If ($PSCmdlet.ParameterSetName -eq 'SessionVariable') {

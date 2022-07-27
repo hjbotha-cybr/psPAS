@@ -89,6 +89,22 @@ Password for user safeadmin: **********
 New-PASSession -Credential $cred -BaseURI https://pvwa.somedomain.com
 ````
 
+#### ISPSS Authentication
+
+- Use a PowerShell credential object containing an Identity OAuth Client Username and Secret
+
+````powershell
+$cred = Get-Credential
+
+PowerShell credential request
+Enter your credentials.
+User: safeadmin
+Password for user safeadmin: **********
+
+
+New-PASSession -Credential $cred -BaseURI https://pvwa.somedomain.com
+````
+
 #### LDAP Authentication
 
 - Specify LDAP credentials allowed to authenticate to the vault.
