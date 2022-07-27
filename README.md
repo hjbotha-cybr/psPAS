@@ -102,7 +102,7 @@ User: safeadmin
 Password for user safeadmin: **********
 
 
-New-PASSession -Credential $cred -BaseURI https://pvwa.somedomain.com
+New-PASSession -Credential $cred -BaseURI https://<subdomain>.privilegecloud.cyberark.cloud -LogonBaseURI https://<subdomain>.cyberark.cloud
 ````
 
 #### LDAP Authentication
