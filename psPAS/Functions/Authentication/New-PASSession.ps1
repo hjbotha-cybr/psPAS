@@ -598,8 +598,6 @@ function New-PASSession {
 
 						Try {
 							#Get CyberArk ExternalVersion number.
-							Write-Verbose "YEP"
-							Write-Verbose ($Script:WebSession.Headers['Authorization'])
 							[System.Version]$Version = Get-PASServer -ErrorAction Stop |
 							Select-Object -ExpandProperty ExternalVersion
 
