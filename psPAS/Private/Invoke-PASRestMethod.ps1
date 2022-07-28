@@ -115,7 +115,7 @@
 	Begin {
 
 		#Set defaults for all function calls
-		#$ProgressPreference = 'SilentlyContinue'
+		$ProgressPreference = 'SilentlyContinue'
 		$PSBoundParameters.Add('UseBasicParsing', $true)
 
 		if ( -not ($PSBoundParameters.ContainsKey('ContentType'))) {
