@@ -22,6 +22,13 @@ function Add-PASSafeMember {
 			Mandatory = $false,
 			ValueFromPipelinebyPropertyName = $true
 		)]
+		[ValidateSet("user", "group", "role")]
+		[string]$MemberType = "user",
+
+		[parameter(
+			Mandatory = $false,
+			ValueFromPipelinebyPropertyName = $true
+		)]
 		[string]$SearchIn,
 
 		[parameter(
@@ -198,7 +205,7 @@ function Add-PASSafeMember {
 
 		#array for parameter names which appear in the top-tier of the JSON object
 		$keysToKeep = [Collections.Generic.List[String]]@(
-			'MemberName', 'SearchIn', 'MembershipExpirationDate', 'Permissions'
+			'MemberName', 'SearchIn', 'MembershipExpirationDate', 'Permissions', 'MemberType'
 		)
 
 	}#begin
